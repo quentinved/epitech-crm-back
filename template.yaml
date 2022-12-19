@@ -1,0 +1,95 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  epitech-crm
+Resources:
+
+  ArticleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 10
+      Handler: main
+      Runtime: go1.x
+      Policies:
+        - AWSLambdaExecute
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ArticleTable
+      Events:
+        GetArticle:
+          Type: Api
+          Properties:
+            Path: /article/{id}
+            Method: GET
+            RestApiId: !Ref DefaultApi
+            Auth:
+              Authorizer: MyCognitoAuth
+        GetArticles:
+          Type: Api
+          Properties:
+            Path: /article
+            Method: GET
+            RestApiId: !Ref DefaultApi
+            Auth:
+              Authorizer: MyCognitoAuth
+        PutArticle:
+          Type: Api
+          Properties:
+            Path: /article
+            Method: POST
+            RestApiId: !Ref DefaultApi
+            Auth:
+              Authorizer: MyCognitoAuth
+        DeleteArticle:
+          Type: Api
+          Properties:
+            Path: /article/{id}
+            Method: DELETE
+            RestApiId: !Ref DefaultApi
+            Auth:
+              Authorizer: MyCognitoAuth
+        UpdateTodo:
+          Type: Api
+          Properties:
+            Path: /article/{id}
+            Method: PUT
+            RestApiId: !Ref DefaultApi
+            Auth:
+              Authorizer: MyCognitoAuth
+    Metadata:
+      BuildMethod: makefile
+
+  DefaultApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+         AllowMethods: "'*'"
+         AllowHeaders: "'*'"
+         AllowOrigin: "'*'"
+      # DefinitionBody:
+      #   'Fn::Transform':
+      #     Name: 'AWS::Include'
+      #     Parameters:
+      #       # Chemin vers la spec OpenAPI
+      #       Location: !Sub "s3://${CicdBucket}/spec/api-spec.yaml"
+      Auth:
+        # AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          MyCognitoAuth:
+            UserPoolArn: arn:aws:cognito-idp:eu-west-3:415386142602:userpool/eu-west-3_GZqditPh6
+            Identity: # OPTIONAL
+              Header: Authorization # OPTIONAL; Default: 'Authorization'
+
+  ArticleTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Articles
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2

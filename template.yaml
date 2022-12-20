@@ -3,11 +3,29 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   epitech-crm
 Resources:
-
-  ArticleFunction:
+# TODO: make different handlers for each function
+  GetArticle:
     Type: AWS::Serverless::Function
     Properties:
-      Timeout: 10
+      Handler: main 
+      Runtime: go1.x
+      Policies:
+        - AWSLambdaExecute
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ArticleTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+              Path: /article/{id}
+              Method: GET
+              RestApiId: !Ref DefaultApi
+              Auth:
+                Authorizer: MyCognitoAuth
+
+  GetArticles:
+    Type: AWS::Serverless::Function
+    Properties:
       Handler: main
       Runtime: go1.x
       Policies:
@@ -15,23 +33,26 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref ArticleTable
       Events:
-        GetArticle:
+        ApiEvent:
           Type: Api
           Properties:
-            Path: /article/{id}
-            Method: GET
-            RestApiId: !Ref DefaultApi
-            Auth:
-              Authorizer: MyCognitoAuth
-        GetArticles:
-          Type: Api
-          Properties:
-            Path: /article
-            Method: GET
-            RestApiId: !Ref DefaultApi
-            Auth:
-              Authorizer: MyCognitoAuth
-        PutArticle:
+              Path: /article
+              Method: GET
+              RestApiId: !Ref DefaultApi
+              Auth:
+                Authorizer: MyCognitoAuth
+
+  PutArticle:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main
+      Runtime: go1.x
+      Policies:
+        - AWSLambdaExecute
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ArticleTable
+      Events:
+        ApiEvent:
           Type: Api
           Properties:
             Path: /article
@@ -39,24 +60,44 @@ Resources:
             RestApiId: !Ref DefaultApi
             Auth:
               Authorizer: MyCognitoAuth
-        DeleteArticle:
+
+  DeleteArticle:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main
+      Runtime: go1.x
+      Policies:
+        - AWSLambdaExecute
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ArticleTable
+      Events:
+        ApiEvent:
           Type: Api
           Properties:
-            Path: /article/{id}
-            Method: DELETE
-            RestApiId: !Ref DefaultApi
-            Auth:
-              Authorizer: MyCognitoAuth
-        UpdateTodo:
+              Path: /article/{id}
+              Method: DELETE
+              RestApiId: !Ref DefaultApi
+              Auth:
+                Authorizer: MyCognitoAuth
+
+  UpdateArticle:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main
+      Runtime: go1.x
+      Policies:
+        - AWSLambdaExecute
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ArticleTable
+      Events:
+        ApiEvent:
           Type: Api
           Properties:
-            Path: /article/{id}
-            Method: PUT
-            RestApiId: !Ref DefaultApi
-            Auth:
-              Authorizer: MyCognitoAuth
-    Metadata:
-      BuildMethod: makefile
+              Path: /article/{id}
+              Method: PUT
+              RestApiId: !Ref DefaultApi
+              Auth:
+                Authorizer: MyCognitoAuth
 
   DefaultApi:
     Type: AWS::Serverless::Api

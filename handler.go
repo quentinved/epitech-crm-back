@@ -67,7 +67,7 @@ func serverError(err error) (events.APIGatewayProxyResponse, error) {
 }
 
 func processGetArticle(ctx context.Context, id string) (events.APIGatewayProxyResponse, error) {
-	log.Printf("Received GET article request with id = %s", id)
+	log.Printf("Received GET article request with ID = %s", id)
 
 	article, err := getArticle(ctx, id)
 	if err != nil {

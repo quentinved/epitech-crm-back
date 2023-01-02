@@ -107,14 +107,14 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
       - uses: aws-actions/setup-sam@v2
         with:
           version: 1.59.0
 
       - name: Build resources
-        run: sam build --template ${SAM_TEMPLATE} --use-container
+        run: sam build --template ${SAM_TEMPLATE} --use-container -buildvcs=false
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1

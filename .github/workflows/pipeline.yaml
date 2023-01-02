@@ -113,6 +113,9 @@ jobs:
         with:
           version: 1.59.0
 
+      - name: Build go
+        run: go build
+
       - name: Build resources
         run: sam build --template ${SAM_TEMPLATE} --use-container -buildvcs=false
 

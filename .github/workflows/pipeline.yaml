@@ -116,7 +116,7 @@ jobs:
           version: 1.59.0
       
       - name: test 
-        run: go build -buildvcs=false
+        run: git status
 
       - name: Build resources
         run: sam build --use-container

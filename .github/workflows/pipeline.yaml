@@ -109,12 +109,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
-      - uses: aws-actions/setup-sam@v1
+        with:
+          python-version: "3.8"
+      - uses: aws-actions/setup-sam@v2
         with:
           version: 1.59.0
       
       - name: test 
-        run: go version
+        run: go build -buildvcs=false
 
       - name: Build resources
         run: sam build --use-container

@@ -115,8 +115,11 @@ jobs:
         with:
           version: 1.59.0
       
-      - name: test 
-        run: git status
+      - name: git version 
+        run:  git --version
+
+      - name: go version
+        run: go version
 
       - name: Build resources
         run: sam build --use-container

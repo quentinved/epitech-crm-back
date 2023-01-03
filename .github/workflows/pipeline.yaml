@@ -116,7 +116,7 @@ jobs:
           version: 1.59.0
       
       - name: git version 
-        run:  git --version
+        run:  git -c log.showsignature=false show
 
       - name: go version
         run: go version

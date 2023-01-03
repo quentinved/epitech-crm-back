@@ -116,7 +116,7 @@ jobs:
           version: 1.59.0
       
       - name: git version 
-        run:  git config --global --add safe.directory
+        run:  git config --global --add safe.directory ./
 
       - name: go version
         run: go version

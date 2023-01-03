@@ -112,6 +112,10 @@ jobs:
       - uses: aws-actions/setup-sam@v1
         with:
           version: 1.59.0
+      
+      - name: test 
+        run: go version
+
       - name: Build resources
         run: sam build --use-container
 

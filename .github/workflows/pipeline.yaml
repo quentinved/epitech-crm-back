@@ -117,7 +117,7 @@ jobs:
         run: go build -buildvcs=false
 
       - name: Build resources
-        run: sam build --template ${SAM_TEMPLATE} --use-container -buildvcs=false
+        run: sam build --use-container -buildvcs=false
 
       - name: Assume the testing pipeline user role
         uses: aws-actions/configure-aws-credentials@v1

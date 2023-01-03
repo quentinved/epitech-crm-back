@@ -116,7 +116,7 @@ jobs:
           version: 1.59.0
       
       - name: git version 
-        run:  git -c log.showsignature=false show
+        run:  git config --global --add safe.directory
 
       - name: go version
         run: go version

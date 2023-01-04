@@ -19,6 +19,7 @@ type Article struct {
 	Id      string `json:"id" dynamodbav:"id"`
 	Title   string `json:"title" dynamodbav:"title"`
 	Content string `json:"content" dynamodbav:"content"`
+	Tag     string `json:"tag" dynamodbav:"tag"`
 }
 
 const TableName = "Articles"
@@ -67,11 +68,51 @@ func getArticle(ctx context.Context, id string) (*Article, error) {
 	return article, nil
 }
 
+func getArticleByTag(ctx context.Context, tag string) ([]Article, error) {
+	key, err := attributevalue.Marshal(tag)
+	if err != nil {
+		return nil, err
+	}
+
+	input := &dynamodb.QueryInput{
+		TableName:              aws.String(TableName),
+		IndexName:              aws.String("tag-index"),
+		KeyConditionExpression: aws.String("tag = :tag"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":tag": key,
+		},
+	}
+
+	log.Printf("Calling Dynamodb with input: %v", input)
+	result, err := db.Query(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Executed GetItem DynamoDb successfully. Result: %#v", len(result.Items))
+
+	if result.Count == 0 {
+		return nil, nil
+	}
+
+	articles := make([]Article, 0)
+	for _, item := range result.Items {
+		article := new(Article)
+		err = attributevalue.UnmarshalMap(item, article)
+		if err != nil {
+			return nil, err
+		}
+		articles = append(articles, *article)
+	}
+
+	return articles, nil
+}
+
 func insertArticle(ctx context.Context, createArticle CreateArticle) (*Article, error) {
 	article := Article{
 		Title:   createArticle.Title,
 		Content: createArticle.Content,
 		Id:      uuid.NewString(),
+		Tag:     createArticle.Tag,
 	}
 
 	item, err := attributevalue.MarshalMap(article)
@@ -184,6 +225,7 @@ func updateItem(ctx context.Context, id string, updateArticle UpdateArticle) (*A
 		return nil, err
 	}
 
+	// dynamodb.
 	input := &dynamodb.UpdateItemInput{
 		Key: map[string]types.AttributeValue{
 			"id": key,

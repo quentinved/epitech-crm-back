@@ -14,18 +14,19 @@ import (
 type CreateArticle struct {
 	Title   string `json:"Title" validate:"required"`
 	Content string `json:"Content" validate:"required"`
+	Tag     string `json:"Tag"`
 }
 
 type UpdateArticle struct {
 	Title   string `json:"Title" validate:"required"`
 	Content string `json:"Content" validate:"required"`
+	Tag     string `json:"Tag"`
 }
 
 var validate *validator.Validate = validator.New()
 
 func router(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	log.Printf("Received req %#v", req)
-
 	switch req.HTTPMethod {
 	case "GET":
 		return processGet(ctx, req)
@@ -42,7 +43,11 @@ func router(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIG
 
 func processGet(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	id, ok := req.PathParameters["id"]
-	if !ok {
+	tag, okTag := req.QueryStringParameters["tag"]
+
+	if okTag {
+		return processGetArticlesByTag(ctx, tag)
+	} else if !ok {
 		return processGetArticles(ctx)
 	} else {
 		return processGetArticle(ctx, id)
@@ -63,6 +68,35 @@ func serverError(err error) (events.APIGatewayProxyResponse, error) {
 	return events.APIGatewayProxyResponse{
 		Body:       http.StatusText(http.StatusInternalServerError),
 		StatusCode: http.StatusInternalServerError,
+	}, nil
+}
+
+func processGetArticlesByTag(ctx context.Context, tag string) (events.APIGatewayProxyResponse, error) {
+	log.Printf("Received GET article request with Tag = %s", tag)
+
+	article, err := getArticleByTag(ctx, tag)
+	if err != nil {
+		return serverError(err)
+	}
+
+	if article == nil {
+		return clientError(http.StatusNotFound)
+	}
+
+	json, err := json.Marshal(article)
+	if err != nil {
+		return serverError(err)
+	}
+	log.Printf("Successfully fetched article item %s", json)
+
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Headers: map[string]string{
+			"Access-Control-Allow-Origin":  "*",
+			"Access-Control-Allow-Methods": "GET",
+			"Access-Control-Allow-Headers": "Content-Type",
+		},
+		Body: string(json),
 	}, nil
 }
 

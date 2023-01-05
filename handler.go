@@ -141,7 +141,7 @@ func processGetArticles(ctx context.Context) (events.APIGatewayProxyResponse, er
 	if err != nil {
 		return serverError(err)
 	}
-	log.Printf("Successfully fetched articles: %s", json)
+	log.Printf("Successfully fetched articles STPPPPP: %s", json)
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,

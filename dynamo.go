@@ -216,7 +216,7 @@ func updateItem(ctx context.Context, id string, updateArticle UpdateArticle) (*A
 			expression.Value(updateArticle.Content),
 		).Set(
 			expression.Name("tag"),
-			expression.Value(updateArticle.Content),
+			expression.Value(updateArticle.Tag),
 		),
 	).WithCondition(
 		expression.Equal(
